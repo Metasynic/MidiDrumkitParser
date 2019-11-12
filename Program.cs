@@ -34,7 +34,11 @@ namespace MIDI_Drumkit_Parser
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World");
+            MidiReader reader = new MidiReader();
+            reader.Start();
+            Console.ReadKey();
+            reader.Stop();
+            Console.ReadKey();
         }
     }
 }
