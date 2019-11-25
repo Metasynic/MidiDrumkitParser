@@ -1,0 +1,11 @@
+Note 4 - seems to be nothing
+Note 38 - Snare & Rim
+Note 48 - High Tom
+Note 45 - Mid Tom
+Note 43 - Low Tom
+Note 46 - Open High-Hat
+Note 49 - Left Cymbal
+Note 51 - Right Cymbal
+Note 36 - Kick
+Note 44 - Closing High-Hat
+Note 42 - Closed High-Hat

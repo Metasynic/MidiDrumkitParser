@@ -114,7 +114,11 @@ namespace MIDI_Drumkit_Parser
                 Console.WriteLine("Channel Message: " + m.Command + " " + m.MidiChannel + " "
                  + m.Data1.ToString() + " " + m.Data2.ToString());
             }
-            noteEvents.Add(new NoteEvent(Convert.ToByte(m.Data1.ToString()), Convert.ToByte(m.Data2.ToString()), DateTime.Now - baseTime));
+
+            if (m.Command.ToString() == "NoteOn")
+            {
+                noteEvents.Add(new NoteEvent(Convert.ToByte(m.Data1.ToString()), Convert.ToByte(m.Data2.ToString()), DateTime.Now - baseTime));
+            }
         }
 
         void onSysExMessageReceived(object obj, SysExMessageEventArgs e)
