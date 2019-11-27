@@ -38,6 +38,8 @@ namespace MIDI_Drumkit_Parser
             if (InputDevice.DeviceCount == 0)
             {
                 Console.WriteLine("No MIDI devices found.");
+                Thread.Sleep(2000);
+                Environment.Exit(0);
                 return;
             }
             else
@@ -98,6 +100,11 @@ namespace MIDI_Drumkit_Parser
                     Console.WriteLine("Note " + ne.Index + ", Vel " + ne.Velocity + ", Time " + ne.Timestamp.TotalMilliseconds);
                 }
             }
+        }
+
+        public List<NoteEvent> FetchEventList()
+        {
+            return noteEvents;
         }
 
         void inputDevice_Error(object obj, ErrorEventArgs e)
