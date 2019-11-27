@@ -24,8 +24,8 @@ namespace MIDI_Drumkit_Parser
     }
     public class MidiReader
     {
-        bool debugPrintEvents = false;
-        bool debugPrintTimestamps = true;
+        bool debugPrintMIDI = false;
+        bool debugPrintTimestamps = false;
 
         List<NoteEvent> noteEvents;
         const int sysExBufferSize = 128;
@@ -63,7 +63,6 @@ namespace MIDI_Drumkit_Parser
             }
 
             noteEvents = new List<NoteEvent>();
-            baseTime = DateTime.Now;
         }
 
         public void Start()
@@ -116,7 +115,7 @@ namespace MIDI_Drumkit_Parser
         void onChannelMessageReceived(object obj, ChannelMessageEventArgs e)
         {
             ChannelMessage m = e.Message;
-            if (debugPrintEvents)
+            if (debugPrintMIDI)
             {
                 Console.WriteLine("Channel Message: " + m.Command + " " + m.MidiChannel + " "
                  + m.Data1.ToString() + " " + m.Data2.ToString());
@@ -124,6 +123,8 @@ namespace MIDI_Drumkit_Parser
 
             if (m.Command.ToString() == "NoteOn")
             {
+                if (noteEvents.Count == 0)
+                    baseTime = DateTime.Now;
                 noteEvents.Add(new NoteEvent(Convert.ToByte(m.Data1.ToString()), Convert.ToByte(m.Data2.ToString()), DateTime.Now - baseTime));
             }
         }
@@ -131,7 +132,7 @@ namespace MIDI_Drumkit_Parser
         void onSysExMessageReceived(object obj, SysExMessageEventArgs e)
         {
             SysExMessage m = e.Message;
-            if (debugPrintEvents)
+            if (debugPrintMIDI)
             {
                 Console.WriteLine("SysEx Message: " + m.ToString());
             }
@@ -140,7 +141,7 @@ namespace MIDI_Drumkit_Parser
         void onSysCommonMessageReceived(object obj, SysCommonMessageEventArgs e)
         {
             SysCommonMessage m = e.Message;
-            if (debugPrintEvents)
+            if (debugPrintMIDI)
             {
                 Console.WriteLine("SysCommon Message: " + m.SysCommonType.ToString() + " "
                     + m.Data1.ToString() + " " + m.Data2.ToString());
@@ -150,7 +151,7 @@ namespace MIDI_Drumkit_Parser
         void onSysRealtimeMessageReceived(object obj, SysRealtimeMessageEventArgs e)
         {
             SysRealtimeMessage m = e.Message;
-            if (debugPrintEvents)
+            if (debugPrintMIDI)
             {
                 Console.WriteLine("SysRealtime Message: " + m.Message + " " +
                     m.Status + " " + m.Timestamp);

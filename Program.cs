@@ -42,7 +42,7 @@ namespace MIDI_Drumkit_Parser
             Console.ReadKey();
             reader.Stop();
             Console.WriteLine("Recording finished. Processing...");
-            TempoInferrer.ProcessNoteData(reader.FetchEventList());
+            List<BeatEvent> beatEvents = TempoInferrer.NotesToEvents(reader.FetchEventList());
             Console.ReadKey();
         }
     }
