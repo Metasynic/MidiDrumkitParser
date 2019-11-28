@@ -37,9 +37,11 @@ namespace MIDI_Drumkit_Parser
             MidiReader reader = new MidiReader();
             Console.WriteLine("Ready to record. Press any key to begin.");
             Console.ReadKey();
+
             reader.Start();
             Console.WriteLine("Recording started. Press any key to stop the recording.");
             Console.ReadKey();
+
             reader.Stop();
             Console.WriteLine("Recording finished. Processing...");
             List<BeatEvent> beatEvents = TempoInferrer.NotesToEvents(reader.FetchEventList());
