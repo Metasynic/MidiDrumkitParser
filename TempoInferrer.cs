@@ -20,6 +20,7 @@ namespace MIDI_Drumkit_Parser
         {
             MeanTimestamp = note.Timestamp.TotalMilliseconds;
             Notes = new List<NoteEvent>();
+            Notes.Add(note);
         }
         
         /* We add a new note and update the central time for the event at the same time. */
@@ -28,6 +29,46 @@ namespace MIDI_Drumkit_Parser
         {
             Notes.Add(note);
             MeanTimestamp += (note.Timestamp.TotalMilliseconds - MeanTimestamp) / Notes.Count;
+        }
+    }
+
+    /* EventInterval is a unit of time between two BeatEvents. Since it may be similar to
+     * other intervals between notes, we will group these together into clusters. */
+
+    public struct EventInterval
+    {
+        /* Remember both of the events at each end of the interval, and its timespan. */
+        public BeatEvent Event1;
+        public BeatEvent Event2;
+        public double Length;
+
+        public EventInterval(BeatEvent event1, BeatEvent event2)
+        {
+            Event1 = event1;
+            Event2 = event2;
+            Length = Math.Abs(event1.MeanTimestamp - event2.MeanTimestamp);
+        }
+    }
+
+    /* An IntervalCluster is a group of BeatIntervals that are so similar that they can be
+     * considered as one single hypothesis for the tempo of the rhythm. */
+    public class IntervalCluster
+    {
+        public List<EventInterval> Intervals;
+        public double MeanLength;
+
+        public IntervalCluster(EventInterval interval)
+        {
+            MeanLength = interval.Length;
+            Intervals = new List<EventInterval>();
+            Intervals.Add(interval);
+        }
+
+        /* When we add a new interval to the cluster, we update the mean length at the same time. */
+        public void AddInterval(EventInterval interval)
+        {
+            Intervals.Add(interval);
+            MeanLength += (interval.Length - MeanLength) / Intervals.Count;
         }
     }
 
