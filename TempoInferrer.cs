@@ -70,13 +70,25 @@ namespace MIDI_Drumkit_Parser
             Intervals.Add(interval);
             MeanLength += (interval.Length - MeanLength) / Intervals.Count;
         }
+
+        /* If we want to merge two clusters together, we add all the intervals from one into the other. */
+        public void MergeCluster(IntervalCluster cluster)
+        {
+            foreach(EventInterval interval in cluster.Intervals)
+            {
+                AddInterval(interval);
+            }
+        }
     }
 
     /* The TempoInferrer class is the main class for the algorithm. */
     public static class TempoInferrer
     {
-        /* This bool defines whether we'll print our list of events after finding them. */
-        static bool debugPrintEvents = true;
+        /* This bool defines whether we'll print our list of events and/or clusters after finding them. */
+        static bool debugPrintEvents = false;
+        static bool debugPrintClusters = true;
+
+        const double clusterWidth = 25;
 
         /* NotesToEvents takes a list of notes, and outputs a list of BeatEvents.
          * We group together the notes to within 70ms of each other.
@@ -115,6 +127,80 @@ namespace MIDI_Drumkit_Parser
             }
 
             return events;
+        }
+
+        /* EventsToClusters takes a list of beat events, finds all the intervals between them
+         * that are less than 2 seconds long, and then clusters the intervals together into a list of
+         * tempo hypotheses. */
+        public static List<IntervalCluster> EventsToClusters(List<BeatEvent> beatEvents)
+        {
+            List<IntervalCluster> clusters = new List<IntervalCluster>();
+
+            for (int i = 0; i < beatEvents.Count; i++)
+            {
+                for (int j = i + 1; j < beatEvents.Count; j++)
+                {
+                    EventInterval interval = new EventInterval(beatEvents[i], beatEvents[j]);
+                    if (interval.Length < 2000)
+                    {
+                        bool clusterFound = false;
+                        int clusterIndex = 0;
+                        double clusterDistance = double.PositiveInfinity;
+
+                        for (int c = 0; c < clusters.Count; c++)
+                        {
+                            IntervalCluster cluster = clusters[c];
+                            double difference = Math.Abs(cluster.MeanLength - interval.Length);
+                            if (difference < clusterWidth && difference < clusterDistance)
+                            {
+                                clusterFound = true;
+                                clusterIndex = c;
+                                clusterDistance = difference;
+                            }
+                        }
+
+                        if (clusterFound)
+                        {
+                            clusters[clusterIndex].AddInterval(interval);
+                        }
+                        else
+                        {
+                            clusters.Add(new IntervalCluster(interval));
+                        }
+                    }
+                }
+            }
+
+            /* Now cluster the clusters just in case any of the averages have strayed close together. */
+            List<IntervalCluster> newClusters = new List<IntervalCluster>();
+            foreach(IntervalCluster cluster in clusters)
+            {
+                bool matchFound = false;
+                foreach(IntervalCluster newCluster in newClusters)
+                {
+                    if (!matchFound && Math.Abs(cluster.MeanLength - newCluster.MeanLength) < clusterWidth)
+                    {
+                        newCluster.MergeCluster(cluster);
+                        matchFound = true;
+                    }
+                }
+
+                if (!matchFound)
+                {
+                    newClusters.Add(cluster);
+                }
+            }
+
+            /* If the cluster printing flag is set, then display a list of all the found clusters. */
+            if (debugPrintClusters)
+            {
+                foreach(IntervalCluster cluster in newClusters)
+                {
+                    Console.WriteLine("Interval Cluster " + cluster.MeanLength + "ms, with " + cluster.Intervals.Count + " notes.");
+                }
+            }
+
+            return newClusters;
         }
     }
 }
