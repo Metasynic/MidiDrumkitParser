@@ -56,12 +56,14 @@ namespace MIDI_Drumkit_Parser
     {
         public List<EventInterval> Intervals;
         public double MeanLength;
+        public int Rating;
 
         public IntervalCluster(EventInterval interval)
         {
             MeanLength = interval.Length;
             Intervals = new List<EventInterval>();
             Intervals.Add(interval);
+            Rating = 0;
         }
 
         /* When we add a new interval to the cluster, we update the mean length at the same time. */
@@ -88,7 +90,8 @@ namespace MIDI_Drumkit_Parser
         static bool debugPrintEvents = false;
         static bool debugPrintClusters = true;
 
-        const double clusterWidth = 25;
+        const double clusterWidth = 70;
+        const double eventWidth = 70;
 
         /* NotesToEvents takes a list of notes, and outputs a list of BeatEvents.
          * We group together the notes to within 70ms of each other.
@@ -104,7 +107,7 @@ namespace MIDI_Drumkit_Parser
 
                 foreach(BeatEvent _event in events)
                 {
-                    if (!eventFound && Math.Abs(timestamp - _event.MeanTimestamp) < 70)
+                    if (!eventFound && Math.Abs(timestamp - _event.MeanTimestamp) < eventWidth)
                     {
                         eventFound = true;
                         _event.AddNote(note);
@@ -201,6 +204,40 @@ namespace MIDI_Drumkit_Parser
             }
 
             return newClusters;
+        }
+
+        /* When we rate one cluster with respect to another, we add the other cluster's size to it,
+         * weighted by the following function. Small multiples are weighted more heavily than higher ones. */
+        static int Weight(int i)
+        {
+            if (i >= 1 && i <= 4)
+                return 6 - i;
+            else if (i >= 5 && i <= 8)
+                return 1;
+            else
+                return 0;
+        }
+
+        /* In order to obtain a ranking for our different hypotheses, we compare the clusters
+         * against each other to see which of them are integer multiples within a reasonable margin.
+         * Those with many multiples will have a higher score overall than ones without. */
+        public static List<IntervalCluster> RateClusters (List<IntervalCluster> clusters)
+        {
+            foreach(IntervalCluster baseCluster in clusters)
+            {
+                foreach(IntervalCluster comparisonCluster in clusters)
+                {
+                    for(int i = 1; i < 9; i++)
+                    {
+                        if (Math.Abs(baseCluster.MeanLength - (i * comparisonCluster.MeanLength)) < clusterWidth)
+                        {
+                            baseCluster.Rating += Weight(i) * comparisonCluster.Intervals.Count;
+                        }
+                    }
+                }
+            }
+
+            return clusters;
         }
     }
 }
