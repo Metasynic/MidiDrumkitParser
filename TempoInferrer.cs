@@ -81,6 +81,12 @@ namespace MIDI_Drumkit_Parser
                 AddInterval(interval);
             }
         }
+
+        /* Fetch hypothetical BPM for simplicity. */
+        public double GetBPM()
+        {
+            return (1 / MeanLength) * 60 * 1000;
+        }
     }
 
     /* The TempoInferrer class is the main class for the algorithm. */
@@ -88,7 +94,8 @@ namespace MIDI_Drumkit_Parser
     {
         /* This bool defines whether we'll print our list of events and/or clusters after finding them. */
         static bool debugPrintEvents = false;
-        static bool debugPrintClusters = true;
+        static bool debugPrintClusters = false;
+        static bool debugPrintRatedClusters = true;
 
         const double clusterWidth = 70;
         const double eventWidth = 70;
@@ -234,6 +241,18 @@ namespace MIDI_Drumkit_Parser
                             baseCluster.Rating += Weight(i) * comparisonCluster.Intervals.Count;
                         }
                     }
+                }
+            }
+
+            /* Order the clusters by their rating from highest to lowest and then print them if desired. */
+            clusters = clusters.OrderBy(c => c.Rating).ToList();
+            clusters.Reverse();
+
+            if (debugPrintRatedClusters)
+            {
+                foreach (IntervalCluster cluster in clusters)
+                {
+                    Console.WriteLine("Interval Cluster " + cluster.GetBPM() + " BPM, with " + cluster.Intervals.Count + " notes, score " + cluster.Rating + ".");
                 }
             }
 
