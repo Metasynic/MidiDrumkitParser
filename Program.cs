@@ -47,6 +47,7 @@ namespace MIDI_Drumkit_Parser
             List<BeatEvent> beatEvents = TempoInferrer.NotesToEvents(reader.FetchEventList());
             List<IntervalCluster> intervalClusters = TempoInferrer.EventsToClusters(beatEvents);
             intervalClusters = TempoInferrer.RateClusters(intervalClusters);
+            BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
             Console.ReadKey();
         }
     }
