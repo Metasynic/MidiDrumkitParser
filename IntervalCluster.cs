@@ -13,12 +13,12 @@ namespace MIDI_Drumkit_Parser
     {
         /* We keep track of the average time for this BeatEvent as well as the notes
          * that make it up. */
-        public double MeanTimestamp;
+        public double Time;
         public List<NoteEvent> Notes;
 
         public BeatEvent(NoteEvent note)
         {
-            MeanTimestamp = note.Timestamp.TotalMilliseconds;
+            Time = note.Timestamp.TotalMilliseconds;
             Notes = new List<NoteEvent>();
             Notes.Add(note);
         }
@@ -28,7 +28,7 @@ namespace MIDI_Drumkit_Parser
         public void AddNote(NoteEvent note)
         {
             Notes.Add(note);
-            MeanTimestamp += (note.Timestamp.TotalMilliseconds - MeanTimestamp) / Notes.Count;
+            Time += (note.Timestamp.TotalMilliseconds - Time) / Notes.Count;
         }
     }
 
@@ -46,7 +46,7 @@ namespace MIDI_Drumkit_Parser
         {
             Event1 = event1;
             Event2 = event2;
-            Length = Math.Abs(event1.MeanTimestamp - event2.MeanTimestamp);
+            Length = Math.Abs(event1.Time - event2.Time);
         }
     }
 

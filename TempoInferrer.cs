@@ -31,7 +31,7 @@ namespace MIDI_Drumkit_Parser
 
                 foreach(BeatEvent _event in events)
                 {
-                    if (!eventFound && Math.Abs(timestamp - _event.MeanTimestamp) < eventWidth)
+                    if (!eventFound && Math.Abs(timestamp - _event.Time) < eventWidth)
                     {
                         eventFound = true;
                         _event.AddNote(note);
@@ -49,7 +49,7 @@ namespace MIDI_Drumkit_Parser
             {
                 foreach(BeatEvent _event in events)
                 {
-                    Console.WriteLine("Event at " + _event.MeanTimestamp + " with " + _event.Notes.Count + " notes.");
+                    Console.WriteLine("Event at " + _event.Time + " with " + _event.Notes.Count + " notes.");
                 }
             }
 
@@ -162,8 +162,7 @@ namespace MIDI_Drumkit_Parser
             }
 
             /* Order the clusters by their rating from highest to lowest and then print them if desired. */
-            clusters = clusters.OrderBy(c => c.Rating).ToList();
-            clusters.Reverse();
+            clusters = clusters.OrderByDescending(c => c.Rating).ToList();
 
             if (debugPrintRatedClusters)
             {
