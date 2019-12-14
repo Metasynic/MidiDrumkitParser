@@ -67,14 +67,17 @@ namespace MIDI_Drumkit_Parser
         const double innerWindow = 40;
         const double outerWindowFactor = 0.3;
         const double initialPeriod = 5000;
-        const double maximumInterval = 2000;
-        const double correctionFactor = 0.3;
+        const double maximumInterval = 3000;
+        const double correctionFactor = 0.2;
+        const int numberOfHypotheses = 5;
 
         public static BeatTracker FindBeat(List<IntervalCluster> tempoHypotheses, List<BeatEvent> events)
         {
             List<BeatTracker> trackers = new List<BeatTracker>();
-            foreach(IntervalCluster cluster in tempoHypotheses)
+            for(int i = 0; i < Math.Min(numberOfHypotheses, tempoHypotheses.Count); i++)
             {
+                IntervalCluster cluster = tempoHypotheses[i];
+                Console.WriteLine("Cluster " + cluster.GetBPM());
                 foreach(BeatEvent startEvent in events.Where(e => e.Time < initialPeriod).ToList())
                 {
                     trackers.Add(new BeatTracker(cluster.MeanLength, startEvent));
@@ -107,7 +110,7 @@ namespace MIDI_Drumkit_Parser
                             }
 
                             double error = _event.Time - tracker.NextPrediction;
-                            tracker.Interval += error / correctionFactor;
+                            tracker.Interval += error * correctionFactor;
                             tracker.NextPrediction = _event.Time + tracker.Interval;
                             tracker.ProcessedItems.Add(_event);
 
