@@ -12,8 +12,9 @@ namespace MIDI_Drumkit_Parser
         public double NextPrediction;
         public List<BeatEvent> ProcessedItems;
         public double Rating;
+        public double OriginalScore;
         
-        public BeatTracker(double interval, BeatEvent firstEvent)
+        public BeatTracker(double interval, BeatEvent firstEvent, double originalScore)
         {
             Interval = interval;
             NextPrediction = firstEvent.Time + interval;
@@ -22,6 +23,7 @@ namespace MIDI_Drumkit_Parser
             /* TODO: For now we use the number of notes in the event as the rating.
              * Later this will be weighted by dynamic velocity and instrument. */
             Rating = firstEvent.Notes.Count;
+            OriginalScore = originalScore;
         }
 
         public BeatTracker(BeatTracker tracker)
@@ -30,6 +32,7 @@ namespace MIDI_Drumkit_Parser
             NextPrediction = tracker.NextPrediction;
             ProcessedItems = new List<BeatEvent>(tracker.ProcessedItems);
             Rating = tracker.Rating;
+            OriginalScore = tracker.OriginalScore;
         }
 
         public void TakeBestTracker(BeatTracker tracker)
@@ -40,6 +43,7 @@ namespace MIDI_Drumkit_Parser
                 NextPrediction = tracker.NextPrediction;
                 ProcessedItems = new List<BeatEvent>(tracker.ProcessedItems);
                 Rating = tracker.Rating;
+                OriginalScore = tracker.OriginalScore;
             }
         }
 
@@ -80,7 +84,7 @@ namespace MIDI_Drumkit_Parser
                 Console.WriteLine("Cluster " + cluster.GetBPM());
                 foreach(BeatEvent startEvent in events.Where(e => e.Time < initialPeriod).ToList())
                 {
-                    trackers.Add(new BeatTracker(cluster.MeanLength, startEvent));
+                    trackers.Add(new BeatTracker(cluster.MeanLength, startEvent, cluster.Rating));
                 }
             }
 
@@ -149,6 +153,10 @@ namespace MIDI_Drumkit_Parser
                 trackers = nextTrackers;
             }
 
+            foreach(BeatTracker tracker in trackers)
+            {
+                tracker.Rating *= tracker.OriginalScore;
+            }
             return trackers.OrderByDescending(t => t.Rating).ToList()[0];
         }
     }
