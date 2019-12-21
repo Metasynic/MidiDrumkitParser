@@ -13,6 +13,7 @@ namespace MIDI_Drumkit_Parser
         public List<BeatEvent> ProcessedItems;
         public double Rating;
         public double OriginalScore;
+        const bool debugPrintTrackers = true;
         
         public BeatTracker(double interval, BeatEvent firstEvent, double originalScore)
         {
@@ -73,15 +74,13 @@ namespace MIDI_Drumkit_Parser
         const double initialPeriod = 5000;
         const double maximumInterval = 3000;
         const double correctionFactor = 0.2;
-        const int numberOfHypotheses = 5;
 
         public static BeatTracker FindBeat(List<IntervalCluster> tempoHypotheses, List<BeatEvent> events)
         {
             List<BeatTracker> trackers = new List<BeatTracker>();
-            for(int i = 0; i < Math.Min(numberOfHypotheses, tempoHypotheses.Count); i++)
+            for(int i = 0; i < tempoHypotheses.Count; i++)
             {
                 IntervalCluster cluster = tempoHypotheses[i];
-                Console.WriteLine("Cluster " + cluster.GetBPM());
                 foreach(BeatEvent startEvent in events.Where(e => e.Time < initialPeriod).ToList())
                 {
                     trackers.Add(new BeatTracker(cluster.MeanLength, startEvent, cluster.Rating));
@@ -157,7 +156,16 @@ namespace MIDI_Drumkit_Parser
             {
                 tracker.Rating *= tracker.OriginalScore;
             }
-            return trackers.OrderByDescending(t => t.Rating).ToList()[0];
+
+            trackers = trackers.OrderByDescending(t => t.Rating).ToList();
+
+            // TODO: There are a lot of trackers that appear to be duplicates. Investigate.
+            for (int i = 0; i < Math.Min(trackers.Count, 10); i++)
+            {
+                trackers[i].PrintTracker();
+            }
+
+            return trackers[0];
         }
     }
 }

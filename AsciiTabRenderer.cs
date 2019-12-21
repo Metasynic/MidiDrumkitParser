@@ -83,7 +83,8 @@ namespace MIDI_Drumkit_Parser
 
             using (StreamWriter writer = new StreamWriter("tab.txt"))
             {
-                foreach(string str in tab.Values)
+                writer.WriteLine(Convert.ToInt32(tracker.Interval));
+                foreach (string str in tab.Values)
                 {
                     writer.WriteLine(str);
                 }
