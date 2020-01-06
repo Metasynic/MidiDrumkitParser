@@ -21,69 +21,49 @@ namespace MIDI_Drumkit_Parser
 
     public static class AsciiTabRenderer
     {
-        static Dictionary<byte, LabelSymbolPair> indexToName = new Dictionary<byte, LabelSymbolPair>
+        static Dictionary<Drum, LabelSymbolPair> drumToName = new Dictionary<Drum, LabelSymbolPair>
         {
-            [38] = new LabelSymbolPair(" S", "o"),
-            [48] = new LabelSymbolPair("T1", "o"),
-            [45] = new LabelSymbolPair("T2", "o"),
-            [43] = new LabelSymbolPair("FT", "o"),
-            [46] = new LabelSymbolPair("HH", "o"),
-            [49] = new LabelSymbolPair("LC", "x"),
-            [51] = new LabelSymbolPair("RC", "x"),
-            [36] = new LabelSymbolPair("BD", "o"),
-            [44] = new LabelSymbolPair("HH", "x"),
-            [42] = new LabelSymbolPair("HH", "x")
+            [Drum.Snare] = new LabelSymbolPair(" S", "o"),
+            [Drum.TomHigh] = new LabelSymbolPair("T1", "o"),
+            [Drum.TomMid] = new LabelSymbolPair("T2", "o"),
+            [Drum.TomLow] = new LabelSymbolPair("FT", "o"),
+            [Drum.HatOpen] = new LabelSymbolPair("HH", "o"),
+            [Drum.CrashLeft] = new LabelSymbolPair("LC", "x"),
+            [Drum.CrashRight] = new LabelSymbolPair("RC", "x"),
+            [Drum.Kick] = new LabelSymbolPair("BD", "o"),
+            [Drum.HatClosing] = new LabelSymbolPair("HH", "x"),
+            [Drum.HatClosed] = new LabelSymbolPair("HH", "x")
         };
 
-        public static void RenderAsciiTab(BeatTracker tracker, List<BeatEvent> events)
+        public static void RenderAsciiTab(RhythmStructure rhythm)
         {
-            const byte numDivisions = 4;
-            int eventIndex = 0;
             Dictionary<string, string> tab = new Dictionary<string, string>();
-            foreach (LabelSymbolPair pair in indexToName.Values)
+            foreach (LabelSymbolPair pair in drumToName.Values)
             {
                 tab[pair.label] = pair.label + "|";
             }
 
-            for (int i = 0; i < tracker.ProcessedItems.Count; i++)
+            for (int i = 0; i < rhythm.drums.Count; i++) 
             {
-                BeatEvent baseEvent = tracker.ProcessedItems[i];
-                double interval;
-                if (i != tracker.ProcessedItems.Count - 1)
+                List<Drum> drums = rhythm.drums[i];
+                foreach (string index in tab.Keys.ToList())
                 {
-                    BeatEvent nextEvent = tracker.ProcessedItems[i + 1];
-                    interval = (nextEvent.Time - baseEvent.Time) / 4;
-                }
-                else
-                {
-                    interval = (tracker.NextPrediction - baseEvent.Time) / 4;
+                    tab[index] += "-";
                 }
 
-                for (int j = 0; j < numDivisions; j++)
+                foreach (Drum drum in drums)
                 {
-                    foreach(string index in tab.Keys.ToList())
+                    if (drumToName.Keys.Contains(drum))
                     {
-                        tab[index] += "-";
-                    }
-                    double baseTime = baseEvent.Time + (j * interval);
-                    if (eventIndex < events.Count && baseTime - (interval / 2) < events[eventIndex].Time && baseTime + (interval / 2) > events[eventIndex].Time)
-                    {
-                        foreach (NoteEvent noteEvent in events[eventIndex].Notes)
-                        {
-                            if (indexToName.Keys.Contains(noteEvent.Channel))
-                            {
-                                LabelSymbolPair pair = indexToName[noteEvent.Channel];
-                                tab[pair.label] = tab[pair.label].Remove((i * numDivisions) + j + 3, 1).Insert((i * numDivisions) + j + 3, pair.symbol);
-                            }
-                        }
-                        eventIndex++;
+                        LabelSymbolPair pair = drumToName[drum];
+                        tab[pair.label] = tab[pair.label].Remove(i + 3, 1).Insert(i + 3, pair.symbol);
                     }
                 }
             }
 
             using (StreamWriter writer = new StreamWriter("tab.txt"))
             {
-                writer.WriteLine(Convert.ToInt32(tracker.Interval));
+                writer.WriteLine(Convert.ToInt32(rhythm.beatInterval));
                 foreach (string str in tab.Values)
                 {
                     writer.WriteLine(str);

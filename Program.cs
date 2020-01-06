@@ -48,7 +48,9 @@ namespace MIDI_Drumkit_Parser
             List<IntervalCluster> intervalClusters = TempoInferrer.EventsToClusters(beatEvents);
             intervalClusters = TempoInferrer.RateClusters(intervalClusters);
             BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
-            AsciiTabRenderer.RenderAsciiTab(finalBeat, beatEvents);
+            RhythmStructure rhythm = RhythmCreator.CreateRhythm(finalBeat, beatEvents);
+
+            AsciiTabRenderer.RenderAsciiTab(rhythm);
             SonicPiEmitter.EmitSonicPi();
 
             Console.ReadKey();

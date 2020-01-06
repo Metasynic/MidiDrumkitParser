@@ -52,6 +52,7 @@
     <Compile Include="MidiReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RhythmStructure.cs" />
     <Compile Include="SonicPiEmitter.cs" />
     <Compile Include="TempoInferrer.cs" />
   </ItemGroup>
