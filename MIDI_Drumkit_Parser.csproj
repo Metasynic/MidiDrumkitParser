@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AsciiTabRenderer.cs" />
     <Compile Include="BeatInferrer.cs" />
+    <Compile Include="HierarchicalRhythmInferrer.cs" />
     <Compile Include="IntervalCluster.cs" />
     <Compile Include="MidiReader.cs" />
     <Compile Include="Program.cs" />
