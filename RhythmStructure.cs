@@ -14,20 +14,20 @@ namespace MIDI_Drumkit_Parser
     public class RhythmStructure
     {
         public double beatInterval;
-        public List<List<Drum>> drums;
+        public List<HashSet<Drum>> drums;
 
         public RhythmStructure(double _beatInterval)
         {
             beatInterval = _beatInterval;
-            drums = new List<List<Drum>>();
+            drums = new List<HashSet<Drum>>();
         }
 
-        public List<Drum> GetAtIndex(int beatIndex, int semiQIndex)
+        public HashSet<Drum> GetAtIndex(int beatIndex, int semiQIndex)
         {
             return drums[beatIndex * 4 + semiQIndex];
         }
 
-        public void AddDrums(List<Drum> drumsIn)
+        public void AddDrums(HashSet<Drum> drumsIn)
         {
             drums.Add(drumsIn);
         }
@@ -71,7 +71,7 @@ namespace MIDI_Drumkit_Parser
 
                 for (int j = 0; j < numDivisions; j++)
                 {
-                    List<Drum> drums = new List<Drum>();
+                    HashSet<Drum> drums = new HashSet<Drum>();
 
                     double baseTime = baseEvent.Time + (j * interval);
                     if (eventIndex < events.Count && baseTime - (interval / 2) < events[eventIndex].Time && baseTime + (interval / 2) > events[eventIndex].Time)

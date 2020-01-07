@@ -45,7 +45,7 @@ namespace MIDI_Drumkit_Parser
 
             for (int i = 0; i < rhythm.drums.Count; i++) 
             {
-                List<Drum> drums = rhythm.drums[i];
+                HashSet<Drum> drums = rhythm.drums[i];
                 foreach (string index in tab.Keys.ToList())
                 {
                     tab[index] += "-";
