@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace MIDI_Drumkit_Parser
 {
-    public class HierarchicalRhythm
-    {
-
-    }
-
     public static class HierarchicalRhythmInferrer
     {
         public static RhythmStructure FindRepeatingUnit(RhythmStructure rhythm)
