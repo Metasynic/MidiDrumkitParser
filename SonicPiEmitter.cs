@@ -9,6 +9,7 @@ namespace MIDI_Drumkit_Parser
 {
     public static class SonicPiEmitter
     {
+        /* Lookup table to translate type of drum symbol to the Sonic Pi sample name. */
         static Dictionary<string, string> sampleNames = new Dictionary<string, string>
         {
             [" S"] = ":drum_snare_hard",
@@ -22,6 +23,7 @@ namespace MIDI_Drumkit_Parser
             ["BD"] = ":drum_bass_hard"
         };
 
+        /* Take in the ASCII tab file, and construct a loop of Sonic Pi code matching it. */
         public static void EmitSonicPi()
         {
             using (StreamReader reader = new StreamReader("tab.txt"))
@@ -43,6 +45,7 @@ namespace MIDI_Drumkit_Parser
                     {
                         if (lines[drum][i] != '-')
                         {
+                            /* Trickery to deal with having multiple high hat symbols on the same line. */
                             if (drum.Equals("HH"))
                             {
                                 if (lines[drum][i] == 'x')

@@ -8,6 +8,7 @@ namespace MIDI_Drumkit_Parser
 {
     public static class HierarchicalRhythmInferrer
     {
+        /* This function strips down a rhythm into its smallest repeating unit as a power of two semiquavers. */
         public static RhythmStructure FindRepeatingUnit(RhythmStructure rhythm)
         {
             int rhythmLength = rhythm.drums.Count;
@@ -16,6 +17,8 @@ namespace MIDI_Drumkit_Parser
             int unitLength = 1;
             RhythmStructure rhythmUnit = new RhythmStructure(rhythm.beatInterval);
 
+            /* Basically, start with a unit of length one and check it against the rest of the rhythm,
+             * if it doesn't match keep doubling the length until it matches, or take the original rhythm. */
             while (!repeatingUnitFound && unitLength <= maxRepeatingUnitLength)
             {
                 rhythmUnit = rhythm.CopySub(0, unitLength, rhythm.beatInterval);

@@ -8,6 +8,7 @@ namespace MIDI_Drumkit_Parser
 {
     public static class RhythmCreator
     {
+        /* A lookup table of MIDI indices to Drums. */
         static Dictionary<byte, Drum> indexToDrum = new Dictionary<byte, Drum>
         {
             [38] = Drum.Snare,
@@ -22,12 +23,15 @@ namespace MIDI_Drumkit_Parser
             [36] = Drum.Kick
         };
 
+        /* Create a rhythm from a tracker and list of events, by quantizing the events
+         * according to the beat tracker given to the function. */
         public static RhythmStructure CreateRhythm(BeatTracker tracker, List<BeatEvent> events)
         {
             const byte numDivisions = 4;
             int eventIndex = 0;
             RhythmStructure rhythm = new RhythmStructure(tracker.Interval);
 
+            /* Iterate over all the beats and semiquavers, and set the semiquaver interval. */
             for (int i = 0; i < tracker.ProcessedItems.Count; i++)
             {
                 BeatEvent baseEvent = tracker.ProcessedItems[i];
@@ -46,6 +50,7 @@ namespace MIDI_Drumkit_Parser
                 {
                     HashSet<Drum> drums = new HashSet<Drum>();
 
+                    /* Determine the time at which one semiquaver event occurs and then quantizes each note event to the semiquaver. */
                     double baseTime = baseEvent.Time + (j * interval);
                     if (eventIndex < events.Count && baseTime - (interval / 2) < events[eventIndex].Time && baseTime + (interval / 2) > events[eventIndex].Time)
                     {

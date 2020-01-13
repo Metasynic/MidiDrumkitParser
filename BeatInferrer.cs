@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace MIDI_Drumkit_Parser
 {
+    /* The BeatTracker class is a continuous record-keeper that travels along a rhythm,
+     * tracking whether the notes in the rhythm line up its given tempo hypothesis. */
     public class BeatTracker
     {
         public double Interval;
@@ -15,6 +17,7 @@ namespace MIDI_Drumkit_Parser
         public double OriginalScore;
         const bool debugPrintTrackers = true;
         
+        /* There are two constructors, one of which is a copy constructor. */
         public BeatTracker(double interval, BeatEvent firstEvent, double originalScore)
         {
             Interval = interval;
@@ -26,7 +29,7 @@ namespace MIDI_Drumkit_Parser
             Rating = firstEvent.Notes.Count;
             OriginalScore = originalScore;
         }
-
+        
         public BeatTracker(BeatTracker tracker)
         {
             Interval = tracker.Interval;
@@ -36,6 +39,7 @@ namespace MIDI_Drumkit_Parser
             OriginalScore = tracker.OriginalScore;
         }
 
+        /* Effectively merges two trackers together based on which has the best rating. */
         public void TakeBestTracker(BeatTracker tracker)
         {
             if (tracker.Rating > Rating)
@@ -61,8 +65,10 @@ namespace MIDI_Drumkit_Parser
         }
     }
 
+    /* BeatInferrer runs a set of BeatTrackers against the rhythm to find the best beat alignment. */
     public static class BeatInferrer
     {
+        /* Fuzzy comparison of trackers, since they can be non-identical but functionally the same. */
         static bool SimilarTrackers(BeatTracker first, BeatTracker second)
         {
             return (Math.Abs(first.Interval - second.Interval) < 10) && (Math.Abs(first.NextPrediction - second.NextPrediction) < 20);
@@ -77,6 +83,7 @@ namespace MIDI_Drumkit_Parser
 
         public static BeatTracker FindBeat(List<IntervalCluster> tempoHypotheses, List<BeatEvent> events)
         {
+            /* First, create all the trackers. */
             List<BeatTracker> trackers = new List<BeatTracker>();
             for(int i = 0; i < tempoHypotheses.Count; i++)
             {
@@ -87,12 +94,14 @@ namespace MIDI_Drumkit_Parser
                 }
             }
 
+            /* Iterate through every event in the rhythm, processing each tracker. */
             foreach(BeatEvent _event in events)
             {
                 List<BeatTracker> newTrackers = new List<BeatTracker>();
 
                 for(int i = trackers.Count - 1; i >= 0; i--)
                 {
+                    /* If any tracker has gone too long without detecting a beat candidate, drop it. */
                     BeatTracker tracker = trackers[i];
                     if (_event.Time - tracker.ProcessedItems[tracker.ProcessedItems.Count - 1].Time > maximumInterval)
                     {
@@ -100,24 +109,29 @@ namespace MIDI_Drumkit_Parser
                     }
                     else
                     {
+                        /* Catch the trackers up with the current event. */
                         while (tracker.NextPrediction + (outerWindowFactor * tracker.Interval) < _event.Time)
                         {
                             tracker.NextPrediction += tracker.Interval;
                         }
+
+                        /* Check whether the event is a feasible beat time. */
                         if (_event.Time > tracker.NextPrediction - (outerWindowFactor * tracker.Interval) 
                             && (_event.Time < tracker.NextPrediction + (outerWindowFactor * tracker.Interval)))
                         {
+                            /* If it's too close to be sure, create another tracker. */
                             if (Math.Abs(_event.Time - tracker.NextPrediction) > innerWindow)
                             {
                                 newTrackers.Add(new BeatTracker(tracker));
                             }
 
+                            /* Update the tracker to prepare for the next loop iteration. */
                             double error = _event.Time - tracker.NextPrediction;
                             tracker.Interval += error * correctionFactor;
                             tracker.NextPrediction = _event.Time + tracker.Interval;
                             tracker.ProcessedItems.Add(_event);
 
-                            //TODO: Switch Count out for salience
+                            // TODO: Switch Count out for velocity / drum specific stuff
                             tracker.Rating += (1 - (Math.Abs(error) / (2 * tracker.NextPrediction))) * _event.Notes.Count;
                         }
                     }
@@ -152,6 +166,7 @@ namespace MIDI_Drumkit_Parser
                 trackers = nextTrackers;
             }
 
+            /* Weight each tracker's rating by the original score, so as to avoid very short beat selections. */
             foreach(BeatTracker tracker in trackers)
             {
                 tracker.Rating *= tracker.OriginalScore;

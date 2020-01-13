@@ -7,6 +7,7 @@ using System.IO;
 
 namespace MIDI_Drumkit_Parser
 {
+    /* A LabelSymbolPair translates the label for a drum to the symbol for the ASCII tab. */
     public struct LabelSymbolPair
     {
         public string label;
@@ -21,6 +22,7 @@ namespace MIDI_Drumkit_Parser
 
     public static class AsciiTabRenderer
     {
+        /* This lookup table translates from Drums to LabelSymbolPairs. */
         static Dictionary<Drum, LabelSymbolPair> drumToName = new Dictionary<Drum, LabelSymbolPair>
         {
             [Drum.Snare] = new LabelSymbolPair(" S", "o"),
@@ -35,6 +37,7 @@ namespace MIDI_Drumkit_Parser
             [Drum.HatClosed] = new LabelSymbolPair("HH", "x")
         };
 
+        /* We render the ASCII tab based on the original rhythm. */
         public static void RenderAsciiTab(RhythmStructure rhythm)
         {
             Dictionary<string, string> tab = new Dictionary<string, string>();
@@ -43,6 +46,7 @@ namespace MIDI_Drumkit_Parser
                 tab[pair.label] = pair.label + "|";
             }
 
+            /* Initialize each slot with the "-" symbol then replace it if we find any of the right drum during this interval. */
             for (int i = 0; i < rhythm.drums.Count; i++) 
             {
                 HashSet<Drum> drums = rhythm.drums[i];
@@ -61,6 +65,7 @@ namespace MIDI_Drumkit_Parser
                 }
             }
 
+            /* Finally write out the tab to a text file. */
             using (StreamWriter writer = new StreamWriter("tab.txt"))
             {
                 writer.WriteLine(Convert.ToInt32(rhythm.beatInterval));

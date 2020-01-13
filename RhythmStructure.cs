@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace MIDI_Drumkit_Parser
 {
+    /* Types of Drum. */
     public enum Drum
     {
         Snare, TomHigh, TomMid, TomLow, HatOpen, HatClosed, HatClosing, CrashLeft, CrashRight, Kick
     }
 
+    /* A class for a rhythm, making up a list of the drums used in each semiquaver,
+     * and the interval between beats in milliseconds. */
     public class RhythmStructure
     {
         public double beatInterval;
         public List<HashSet<Drum>> drums;
-        internal int unitLength;
 
         public RhythmStructure(double _beatInterval)
         {
@@ -23,6 +25,8 @@ namespace MIDI_Drumkit_Parser
             drums = new List<HashSet<Drum>>();
         }
 
+        /* Functions to get the set of Drums played on a certain semiquaver,
+         * add drums to a semiquaver, and copy a subsection of the rhythm. */
         public HashSet<Drum> GetAtIndex(int beatIndex, int semiQIndex)
         {
             return drums[beatIndex * 4 + semiQIndex];
