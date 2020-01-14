@@ -24,9 +24,9 @@ namespace MIDI_Drumkit_Parser
             NextPrediction = firstEvent.Time + interval;
             ProcessedItems = new List<BeatEvent>();
             ProcessedItems.Add(firstEvent);
-            /* TODO: For now we use the number of notes in the event as the rating.
-             * Later this will be weighted by dynamic velocity and instrument. */
-            Rating = firstEvent.Notes.Count;
+            /* TODO: For now we use sum of velocities as the rating.
+             * This should also use drum-specific information. */
+            Rating = firstEvent.Notes.Sum(n => n.Velocity);
             OriginalScore = originalScore;
         }
         
@@ -74,7 +74,7 @@ namespace MIDI_Drumkit_Parser
             return (Math.Abs(first.Interval - second.Interval) < 10) && (Math.Abs(first.NextPrediction - second.NextPrediction) < 20);
         }
 
-        // TODO: The outerWindow may be better as a coefficient of the current hypothetical beat interval.
+        // TODO: The outerWindow may not be better as a coefficient of the current hypothetical beat interval.
         const double innerWindow = 40;
         const double outerWindowFactor = 0.3;
         const double initialPeriod = 5000;
@@ -131,8 +131,8 @@ namespace MIDI_Drumkit_Parser
                             tracker.NextPrediction = _event.Time + tracker.Interval;
                             tracker.ProcessedItems.Add(_event);
 
-                            // TODO: Switch Count out for velocity / drum specific stuff
-                            tracker.Rating += (1 - (Math.Abs(error) / (2 * tracker.NextPrediction))) * _event.Notes.Count;
+                            // TODO: Add drum specific stuff as well as velocity
+                            tracker.Rating += (1 - (Math.Abs(error) / (2 * tracker.NextPrediction))) * _event.Notes.Sum(n => n.Velocity);
                         }
                     }
                 }

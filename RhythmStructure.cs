@@ -116,5 +116,37 @@ namespace MIDI_Drumkit_Parser
             Root = new HierarchicalRhythmNode();
             Root.Deepen(depth);
         }
+
+        // Here "level" is the base 2 logarithm of the number of units on that level.
+        private void AddDrumAt(int level, int index, Drum drum, HierarchicalRhythmNode node)
+        {
+            if (level < 0)
+                throw new Exception("Attempted to add drum at level " + level);
+
+            // Top of tree, insert here
+            if (level == 0)
+            {
+                node.drums.Add(drum);
+            }
+            else
+            {
+                // Go down the left branch
+                if (index < Math.Pow(2, level))
+                {
+                    AddDrumAt(level - 1, index, drum, node.Left);
+                }
+                // Go down the right branch
+                else
+                {
+                    int newIndex = index - Convert.ToInt32(Math.Pow(2, level - 1));
+                    AddDrumAt(level - 1, newIndex, drum, node.Right);
+                }
+            }
+        }
+
+        public void AddDrum(int level, int index, Drum drum)
+        {
+            AddDrumAt(level, index, drum, Root);
+        }
     }
 }
