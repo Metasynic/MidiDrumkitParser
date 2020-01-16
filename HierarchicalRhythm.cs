@@ -37,30 +37,21 @@ namespace MIDI_Drumkit_Parser
             }
         }
 
-        public void Print()
+        public void Print(int level)
         {
-            // TODO: This needs to be BFS, not DFS
-            Console.Write("Node: ");
-            if (drums.Count > 0)
+            if (level == 0)
             {
+                Console.Write("{");
                 foreach(Drum drum in drums)
                 {
                     Console.Write(drum + " ");
                 }
+                Console.Write("} ");
             }
-            Console.WriteLine();
-
-            if (Left != null)
+            else
             {
-                Console.WriteLine("Left: {");
-                Left.Print();
-                Console.WriteLine("}");
-            }
-            if (Right != null)
-            {
-                Console.WriteLine("Right: {");
-                Right.Print();
-                Console.WriteLine("}");
+                Left.Print(level - 1);
+                Right.Print(level - 1);
             }
         }
     }
@@ -69,13 +60,15 @@ namespace MIDI_Drumkit_Parser
     {
         public HierarchicalRhythmNode Root;
         public double interval;
+        private int depth;
 
         // Here "depth" is the base 2 logarithm of the number of units in the rhythm.
-        public HierarchicalRhythm(double _interval, int depth)
+        public HierarchicalRhythm(double _interval, int _depth)
         {
             interval = _interval;
             Root = new HierarchicalRhythmNode();
-            Root.Deepen(depth);
+            Root.Deepen(_depth);
+            depth = _depth;
         }
 
         // Here "level" is the base 2 logarithm of the number of units on that level.
@@ -112,7 +105,11 @@ namespace MIDI_Drumkit_Parser
 
         public void Print()
         {
-            Root.Print();
+            for (int i = 0; i <= depth; i++)
+            {
+                Root.Print(i);
+                Console.WriteLine();
+            }
         }
     }
 }

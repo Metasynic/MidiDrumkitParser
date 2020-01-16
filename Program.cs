@@ -50,11 +50,12 @@ namespace MIDI_Drumkit_Parser
             BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
             RhythmStructure rhythm = RhythmCreator.CreateRhythm(finalBeat, beatEvents);
             RhythmStructure repeatingRhythm = HierarchicalRhythmInferrer.FindRepeatingUnit(rhythm);
-            HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(rhythm);
-            hRhythm.Print();
 
             AsciiTabRenderer.RenderAsciiTab(repeatingRhythm);
             SonicPiEmitter.EmitSonicPi();
+
+            HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(repeatingRhythm);
+            hRhythm.Print();
 
             Console.ReadKey();
         }
