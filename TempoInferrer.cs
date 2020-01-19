@@ -118,6 +118,17 @@ namespace MIDI_Drumkit_Parser
                 }
             }
 
+            /* Remove clusters with unrealistically large or small intervals,
+             * greater than 240 BPM or less than 60 BPM. */
+            for(int i = newClusters.Capacity - 1; i >= 0; i--)
+            {
+                IntervalCluster cluster = newClusters[i];
+                if (cluster.MeanLength < 250 || cluster.MeanLength > 1000)
+                {
+                    newClusters.Remove(cluster);
+                }
+            }
+
             /* If the cluster printing flag is set, then display a list of all the found clusters. */
             if (debugPrintClusters)
             {
