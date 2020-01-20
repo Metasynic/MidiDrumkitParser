@@ -118,17 +118,6 @@ namespace MIDI_Drumkit_Parser
                 }
             }
 
-            /* Remove clusters with unrealistically large or small intervals,
-             * greater than 240 BPM or less than 60 BPM. */
-            for(int i = newClusters.Capacity - 1; i >= 0; i--)
-            {
-                IntervalCluster cluster = newClusters[i];
-                if (cluster.MeanLength < 250 || cluster.MeanLength > 1000)
-                {
-                    newClusters.Remove(cluster);
-                }
-            }
-
             /* If the cluster printing flag is set, then display a list of all the found clusters. */
             if (debugPrintClusters)
             {
@@ -174,6 +163,17 @@ namespace MIDI_Drumkit_Parser
 
             /* Order the clusters by their rating from highest to lowest and then print them if desired. */
             clusters = clusters.OrderByDescending(c => c.Rating).ToList();
+
+            /* Remove clusters with unrealistically large or small intervals,
+             * greater than 240 BPM or less than 60 BPM. */
+            for(int i = clusters.Count - 1; i >= 0; i--)
+            {
+                IntervalCluster cluster = clusters[i];
+                if (cluster.MeanLength < 250 || cluster.MeanLength > 1000)
+                {
+                    clusters.Remove(cluster);
+                }
+            }
 
             if (debugPrintRatedClusters)
             {
