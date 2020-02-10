@@ -30,7 +30,7 @@ namespace MIDI_Drumkit_Parser
         /* The debugPrintMIDI shows raw events as they occur, 
          * debugPrintTimestamps shows the sequence of notes after recording. */
         bool debugPrintMIDI = false;
-        bool debugPrintTimestamps = false;
+        bool debugPrintTimestamps = true;
 
         /* Variables to be used. Mostly MIDI stuff and the recording start time. */
         List<NoteEvent> noteEvents;

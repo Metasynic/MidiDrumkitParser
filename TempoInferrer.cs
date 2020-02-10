@@ -10,7 +10,7 @@ namespace MIDI_Drumkit_Parser
     public static class TempoInferrer
     {
         /* This bool defines whether we'll print our list of events and/or clusters after finding them. */
-        static bool debugPrintEvents = false;
+        static bool debugPrintEvents = true;
         static bool debugPrintClusters = false;
         static bool debugPrintRatedClusters = true;
 

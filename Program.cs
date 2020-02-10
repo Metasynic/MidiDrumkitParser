@@ -34,28 +34,34 @@ namespace MIDI_Drumkit_Parser
     {
         static void Main(string[] args)
         {
-            MidiReader reader = new MidiReader();
-            Console.WriteLine("Ready to record. Press any key to begin.");
-            Console.ReadKey();
+            bool edit_only = true;
 
-            reader.Start();
-            Console.WriteLine("Recording started. Press any key to stop the recording.");
-            Console.ReadKey();
+            if (!edit_only)
+            {
+                MidiReader reader = new MidiReader();
+                Console.WriteLine("Ready to record. Press any key to begin.");
+                Console.ReadKey();
 
-            reader.Stop();
-            Console.WriteLine("Recording finished. Processing...");
-            List<BeatEvent> beatEvents = TempoInferrer.NotesToEvents(reader.FetchEventList());
-            List<IntervalCluster> intervalClusters = TempoInferrer.EventsToClusters(beatEvents);
-            intervalClusters = TempoInferrer.RateClusters(intervalClusters);
-            BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
-            RhythmStructure rhythm = RhythmCreator.CreateRhythm(finalBeat, beatEvents);
-            RhythmStructure repeatingRhythm = HierarchicalRhythmInferrer.FindRepeatingUnit(rhythm);
+                reader.Start();
+                Console.WriteLine("Recording started. Press any key to stop the recording.");
+                Console.ReadKey();
 
-            AsciiTabRenderer.RenderAsciiTab(repeatingRhythm);
+                reader.Stop();
+                Console.WriteLine("Recording finished. Processing...");
+                List<BeatEvent> beatEvents = TempoInferrer.NotesToEvents(reader.FetchEventList());
+                List<IntervalCluster> intervalClusters = TempoInferrer.EventsToClusters(beatEvents);
+                intervalClusters = TempoInferrer.RateClusters(intervalClusters);
+                BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
+                RhythmStructure rhythm = RhythmCreator.CreateRhythm(finalBeat, beatEvents);
+                RhythmStructure repeatingRhythm = HierarchicalRhythmInferrer.FindRepeatingUnit(rhythm);
+
+                AsciiTabRenderer.RenderAsciiTab(repeatingRhythm);
+                HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(repeatingRhythm);
+                hRhythm.Print();
+            }
+
+            /* Read in (possibly edited) ASCII tab and convert to Sonic Pi */
             SonicPiEmitter.EmitSonicPi();
-
-            HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(repeatingRhythm);
-            hRhythm.Print();
 
             Console.ReadKey();
         }
