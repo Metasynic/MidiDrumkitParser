@@ -34,7 +34,8 @@ namespace MIDI_Drumkit_Parser
     {
         static void Main(string[] args)
         {
-            bool edit_only = true;
+            bool edit_only = false;
+            bool find_hierarchy = true;
 
             if (!edit_only)
             {
@@ -53,11 +54,19 @@ namespace MIDI_Drumkit_Parser
                 intervalClusters = TempoInferrer.RateClusters(intervalClusters);
                 BeatTracker finalBeat = BeatInferrer.FindBeat(intervalClusters, beatEvents);
                 RhythmStructure rhythm = RhythmCreator.CreateRhythm(finalBeat, beatEvents);
-                RhythmStructure repeatingRhythm = HierarchicalRhythmInferrer.FindRepeatingUnit(rhythm);
 
-                AsciiTabRenderer.RenderAsciiTab(repeatingRhythm);
-                HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(repeatingRhythm);
-                hRhythm.Print();
+                if (find_hierarchy)
+                {
+                    rhythm = HierarchicalRhythmInferrer.FindRepeatingUnit(rhythm);
+                }
+
+                AsciiTabRenderer.RenderAsciiTab(rhythm);
+
+                if (find_hierarchy)
+                {
+                    HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(rhythm);
+                    hRhythm.Print();
+                }
             }
 
             /* Read in (possibly edited) ASCII tab and convert to Sonic Pi */
