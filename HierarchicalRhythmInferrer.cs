@@ -12,9 +12,9 @@ namespace MIDI_Drumkit_Parser
         public static RhythmStructure FindRepeatingUnit(RhythmStructure rhythm)
         {
             int rhythmLength = rhythm.drums.Count;
-            int maxRepeatingUnitLength = Convert.ToInt32(Math.Pow(2, Math.Floor(Math.Log(rhythmLength, 2))));
+            int maxRepeatingUnitLength = 4 * (rhythmLength / 4);
             bool repeatingUnitFound = false;
-            int unitLength = 1;
+            int unitLength = 4;
             RhythmStructure rhythmUnit = new RhythmStructure(rhythm.beatInterval);
 
             /* Basically, start with a unit of length one and check it against the rest of the rhythm,
@@ -33,7 +33,7 @@ namespace MIDI_Drumkit_Parser
                     }
                 }
 
-                unitLength *= 2;
+                unitLength += 4;
             }
 
             return rhythmUnit;
