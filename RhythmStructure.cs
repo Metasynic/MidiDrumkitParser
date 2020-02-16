@@ -25,7 +25,7 @@ namespace MIDI_Drumkit_Parser
             drums = new List<HashSet<Drum>>();
         }
 
-        // TODO: This copy may need to go deeper as it copies hash set references.
+        // NOTE: This copy may need to go deeper as it copies hash set references.
         public RhythmStructure(RhythmStructure rhythm)
         {
             beatInterval = rhythm.beatInterval;
