@@ -130,7 +130,7 @@ namespace MIDI_Drumkit_Parser
                             tracker.NextPrediction = _event.Time + tracker.Interval;
                             tracker.ProcessedItems.Add(_event);
 
-                            // NOTE: It might be useful to drum specific stuff as well as velocity
+                            // NOTE: It might be useful to have drum specific stuff as well as velocity
                             tracker.Rating += (1 - (Math.Abs(error) / (2 * tracker.NextPrediction))) * _event.Notes.Sum(n => n.Velocity);
                         }
                     }

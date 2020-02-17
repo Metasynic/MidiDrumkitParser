@@ -35,7 +35,7 @@ namespace MIDI_Drumkit_Parser
         static void Main(string[] args)
         {
             bool edit_only = false;
-            bool find_hierarchy = true;
+            bool find_hierarchy = false;
 
             if (!edit_only)
             {
