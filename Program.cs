@@ -35,7 +35,7 @@ namespace MIDI_Drumkit_Parser
         static void Main(string[] args)
         {
             bool edit_only = false;
-            bool find_hierarchy = false;
+            bool find_hierarchy = true;
 
             if (!edit_only)
             {
@@ -62,6 +62,8 @@ namespace MIDI_Drumkit_Parser
 
                 AsciiTabRenderer.RenderAsciiTab(rhythm);
 
+                Console.WriteLine("ASCII Tab rendered to tab.txt.");
+
                 if (find_hierarchy)
                 {
                     HierarchicalRhythm hRhythm = HierarchicalRhythmInferrer.CreateHierarchicalRhythm(rhythm);
@@ -71,6 +73,8 @@ namespace MIDI_Drumkit_Parser
 
             /* Read in (possibly edited) ASCII tab and convert to Sonic Pi */
             SonicPiEmitter.EmitSonicPi();
+
+            Console.WriteLine("Sonic Pi code emitted to sonicpi.txt");
 
             Console.ReadKey();
         }
